@@ -1,7 +1,9 @@
 package com.ymagis.daf.response;
 
+import org.codehaus.jackson.annotate.JsonIgnoreProperties;
 import org.codehaus.jackson.annotate.JsonProperty;
 
+@JsonIgnoreProperties(ignoreUnknown = true)
 public class TestResponse {
 	@JsonProperty("good")
 	private int good;

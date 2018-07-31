@@ -7,11 +7,12 @@ import java.util.Set;
 import com.ymagis.daf.response.StartResponse;
 import com.ymagis.daf.response.TestResponse;
 
-
 public class App {
 	private Game game;
 	private static boolean testLocal = true;
+	private static boolean isStart = true;
 	private static int callCount = 0;
+	private static int size = 0;
 
 	public final static String RIGHT = "12345";
 
@@ -21,46 +22,41 @@ public class App {
 
 	public static void main(String[] args) {
 		App app = new App();
-		int N = 5;
-		if (!testLocal) {
+		size = RIGHT.length();
+		if (!testLocal && !isStart) {
 			StartResponse startResponse = app.game.start();
 			System.out.println(startResponse);
-			N = startResponse.getSize();
+			size = startResponse.getSize();
 		}
-
-		int[] ret = app.masterMind(N);
+		int[] ret = app.phase1();
 		Set<Integer> alreadyPlaced = new HashSet<Integer>();
-		int[] test = new int[N];
-		app.callTest(N, 0, alreadyPlaced, test, ret);
+		int[] test = new int[size];
+		app.phase2(0, alreadyPlaced, test, ret);
 		System.out.println(Arrays.toString(ret));
 		System.out.println(Arrays.toString(test));
 	}
 
-	public int[] masterMind(int n) {
+	public int[] phase1() {
 		String number = "";
 		int count = 0;
-		int[] ret = new int[n];
+		int[] ret = new int[size];
 		for (int i = 0; i < 10; i++) {
 			number = "";
-			for (int j = 0; j < n; j++) {
+			for (int j = 0; j < size; j++) {
 				number += i;
 			}
-			TestResponse testResponse = null;
-			if (testLocal) {
-				testResponse = check(number, RIGHT);
-			} else {
-				testResponse = game.test(number);
-			}
+			TestResponse testResponse = getTestResponse(number);
 			if (testResponse.getGood() > 0) {
 				for (int j = 0; j < testResponse.getGood(); j++) {
 					ret[count] = i;
 					count++;
 				}
 			}
-			if (count == n) {
+			if (count == size) {
 				break;
 			}
 		}
+		System.out.println("Phase 1 " + Arrays.toString(ret));
 		return ret;
 	}
 
@@ -72,50 +68,53 @@ public class App {
 		return string.toString();
 	}
 
-	public void callTest(int N, int idx, Set<Integer> alreadyPlaced, int[] test, int[] tableNumber) {
-		for (int i = 0; i < N; ++i) {
-			if (alreadyPlaced.contains(i))
-				// if i in alreadyPlaced
-				continue;
-
-			alreadyPlaced.add(i);
-			test[idx] = tableNumber[i];
-			TestResponse testResponse = null;
-			if (idx == (N - 1)) {
-
-				String answer = intToString(test);
-				if (RIGHT.equals(answer)) {
-					System.out.println("good answer: found");
-					System.out.println(Arrays.toString(test));
-					System.out.println("call count : " + callCount);
-					System.exit(0);
-				} else {
-					if (testLocal) {
-						testResponse = check(answer, RIGHT); //
-					} else {
-						testResponse = game.test(intToString(test)); //
-					}
-				}
-
-				if (testResponse.getGood() == N) {
-					System.out.println("good answer");
-					System.out.println(Arrays.toString(test));
-					System.out.println("call count : " + callCount);
-					System.exit(0);
-				}
-				System.out.println(Arrays.toString(test));
-				System.out.println(testResponse);
-
-			} else
-				callTest(N, idx + 1, alreadyPlaced, test, tableNumber);
-
-			alreadyPlaced.remove(i);
+	private int checkTest(int[] test) {
+		TestResponse testResponse = getTestResponse(intToString(test));
+		int good = testResponse.getGood();
+		if (good == size) {
+			System.out.println("good answer: found");
+			System.out.println(Arrays.toString(test));
+			System.out.println("call count : " + callCount);
+			System.exit(0);
 		}
+		return good;
+	}
+
+	private TestResponse getTestResponse(String s) {
+		callCount++;
+		TestResponse testResponse = null;
+		if (testLocal) {
+			testResponse = check(s, RIGHT);
+		} else {
+			testResponse = game.test(s);
+		}
+		System.out.println(testResponse);
+		System.out.println(s);
+		return testResponse;
+	}
+
+	public void phase2(int idx, Set<Integer> alreadyPlaced, int[] test, int[] tableNumber) {
+		checkTest(tableNumber);
+		int[] trouve = new int[size];
+		Arrays.fill(trouve, tableNumber[0]);
+		int[] p = new int[size];
+		Arrays.fill(p, tableNumber[0]);
+		for (int c = 0; c < size; ++c) {
+			int noteMax = 0;
+			for (int n = 0; n < size; ++n) {
+				p[c] = tableNumber[n];
+				int note = checkTest(p);
+				if ((note > 0) && (note >= noteMax)) {
+					noteMax = note;
+					trouve[c] = tableNumber[n];
+				}
+			}
+		}
+		checkTest(p);
 	}
 
 	public TestResponse check(String result, String rightAnswer) {
 		// si
-		callCount++;
 		TestResponse response = new TestResponse();
 		char[] resultArray = result.toCharArray();
 		char[] rightAnswerArray = rightAnswer.toCharArray();

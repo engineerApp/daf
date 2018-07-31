@@ -17,9 +17,6 @@ import java.net.*;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-/**
- * @author daf token post api/start api/test
- */
 public class ApiClient {
 
 	private final String baseUrl;
@@ -47,29 +44,32 @@ public class ApiClient {
 		return c;
 	}
 
-	public StartResponse start(StartRequest startRequest) {
+	public ClientResponse getClientResponse(String path, String input) {
 		ClientResponse res = null;
+		res = client.resource(baseUrl).path(path).type("application/json").accept(MediaType.APPLICATION_JSON_TYPE)
+				.post(ClientResponse.class, input);
+		return res;
+	}
 
+	public StartResponse start(StartRequest startRequest) {
+		ClientResponse startClientResponse = null;
 		try {
-			String input = mapper.writeValueAsString(startRequest);
-			res = client.resource(baseUrl).path(START).type("application/json").accept(MediaType.APPLICATION_JSON_TYPE)
-					.post(ClientResponse.class, input);
-
-			// .queryParams(startRequest.getParameters())
-
-			if (res.getStatus() == 200) {
-				StartResponse response = mapper.readValue(res.getEntity(String.class), StartResponse.class);
-				return response;
+			String startInput = mapper.writeValueAsString(startRequest);
+			startClientResponse = getClientResponse(START, startInput);
+			if (startClientResponse.getStatus() == 200) {
+				StartResponse startResponse = mapper.readValue(startClientResponse.getEntity(String.class),
+						StartResponse.class);
+				return startResponse;
 			} else {
-				throw new Exception("Track receiver plugin failed, code error : " + res.getStatus());
+				throw new Exception("Start failed, code error : " + startClientResponse.getStatus());
 			}
 		} catch (Exception e) {
 			Logger.getLogger(ApiClient.class.getName()).log(Level.SEVERE, e.getMessage(), e);
 			return new StartResponse();
 		} finally {
-			if (res != null) {
+			if (startClientResponse != null) {
 				try {
-					res.close();
+					startClientResponse.close();
 				} catch (Exception ignored) {
 				}
 			}
@@ -77,25 +77,24 @@ public class ApiClient {
 	}
 
 	public TestResponse test(TestRequest testRequest) {
-		ClientResponse res = null;
+		ClientResponse testClientResponse = null;
 		try {
-			String input = mapper.writeValueAsString(testRequest);
-			res = client.resource(baseUrl).path(TEST).type("application/json").accept(MediaType.APPLICATION_JSON_TYPE)
-					.post(ClientResponse.class, input);
-
-			if (res.getStatus() == 200) {
-				TestResponse response = mapper.readValue(res.getEntity(String.class), TestResponse.class);
-				return response;
+			String testInput = mapper.writeValueAsString(testRequest);
+			testClientResponse = getClientResponse(TEST, testInput);
+			if (testClientResponse.getStatus() == 200) {
+				String responseString = testClientResponse.getEntity(String.class);
+				TestResponse testResponse = mapper.readValue(responseString, TestResponse.class);
+				return testResponse;
 			} else {
-				throw new Exception("Track receiver plugin failed, code error : " + res.getStatus());
+				throw new Exception("Test failed, code error : " + testClientResponse.getStatus());
 			}
 		} catch (Exception e) {
 			Logger.getLogger(ApiClient.class.getName()).log(Level.SEVERE, e.getMessage(), e);
 			return new TestResponse();
 		} finally {
-			if (res != null) {
+			if (testClientResponse != null) {
 				try {
-					res.close();
+					testClientResponse.close();
 				} catch (Exception ignored) {
 				}
 			}

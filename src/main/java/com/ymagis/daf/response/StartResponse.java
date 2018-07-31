@@ -15,6 +15,9 @@ public class StartResponse {
 	@JsonProperty("quizz_id")
 	private int quizzId;
 
+	@JsonProperty("Error")
+	private String error;
+
 	public StartResponse() {
 
 	}
@@ -41,6 +44,14 @@ public class StartResponse {
 
 	public int getQuizzId() {
 		return quizzId;
+	}
+
+	public String getError() {
+		return error;
+	}
+
+	public void setError(String error) {
+		this.error = error;
 	}
 
 	@Override
