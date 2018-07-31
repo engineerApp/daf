@@ -4,6 +4,8 @@ import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Set;
 
+import org.apache.commons.lang3.StringUtils;
+
 import com.ymagis.daf.response.StartResponse;
 import com.ymagis.daf.response.TestResponse;
 
@@ -28,27 +30,22 @@ public class App {
 			System.out.println(startResponse);
 			size = startResponse.getSize();
 		}
-		int[] ret = app.phase1();
+		String ret = app.phase1();
 		Set<Integer> alreadyPlaced = new HashSet<Integer>();
-		int[] test = new int[size];
-		app.phase2(0, alreadyPlaced, test, ret);
-		System.out.println(Arrays.toString(ret));
-		System.out.println(Arrays.toString(test));
+		app.phase2(0, alreadyPlaced, ret);
+		System.out.println(ret);
 	}
 
-	public int[] phase1() {
+	public String phase1() {
 		String number = "";
 		int count = 0;
-		int[] ret = new int[size];
+		String ret = "";
 		for (int i = 0; i < 10; i++) {
-			number = "";
-			for (int j = 0; j < size; j++) {
-				number += i;
-			}
+			number = StringUtils.repeat(i + "", 5);
 			TestResponse testResponse = getTestResponse(number);
 			if (testResponse.getGood() > 0) {
 				for (int j = 0; j < testResponse.getGood(); j++) {
-					ret[count] = i;
+					ret += i;
 					count++;
 				}
 			}
@@ -56,7 +53,7 @@ public class App {
 				break;
 			}
 		}
-		System.out.println("Phase 1 " + Arrays.toString(ret));
+		System.out.println("Phase 1 " + ret);
 		return ret;
 	}
 
@@ -68,12 +65,12 @@ public class App {
 		return string.toString();
 	}
 
-	private int checkTest(int[] test) {
-		TestResponse testResponse = getTestResponse(intToString(test));
+	private int checkTest(String test) {
+		TestResponse testResponse = getTestResponse(test);
 		int good = testResponse.getGood();
 		if (good == size) {
 			System.out.println("good answer: found");
-			System.out.println(Arrays.toString(test));
+			System.out.println(test);
 			System.out.println("call count : " + callCount);
 			System.exit(0);
 		}
@@ -93,28 +90,27 @@ public class App {
 		return testResponse;
 	}
 
-	public void phase2(int idx, Set<Integer> alreadyPlaced, int[] test, int[] tableNumber) {
+	public void phase2(int idx, Set<Integer> alreadyPlaced, String tableNumber) {
 		checkTest(tableNumber);
-		int[] trouve = new int[size];
-		Arrays.fill(trouve, tableNumber[0]);
-		int[] p = new int[size];
-		Arrays.fill(p, tableNumber[0]);
+		String string = StringUtils.repeat(tableNumber.charAt(0), size);
+		StringBuilder trouve = new StringBuilder(string);
+		StringBuilder p = new StringBuilder(string);
+		p.setCharAt(4, 'x');
 		for (int c = 0; c < size; ++c) {
 			int noteMax = 0;
 			for (int n = 0; n < size; ++n) {
-				p[c] = tableNumber[n];
-				int note = checkTest(p);
+				p.setCharAt(c, tableNumber.charAt(n));
+				int note = checkTest(p.toString());
 				if ((note > 0) && (note >= noteMax)) {
 					noteMax = note;
-					trouve[c] = tableNumber[n];
+					trouve.setCharAt(c, tableNumber.charAt(n));
 				}
 			}
 		}
-		checkTest(p);
+		checkTest(p.toString());
 	}
 
 	public TestResponse check(String result, String rightAnswer) {
-		// si
 		TestResponse response = new TestResponse();
 		char[] resultArray = result.toCharArray();
 		char[] rightAnswerArray = rightAnswer.toCharArray();
