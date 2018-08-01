@@ -1,6 +1,5 @@
 package com.ymagis.daf;
 
-import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -16,7 +15,7 @@ public class App {
 	private static int callCount = 0;
 	private static int size = 0;
 
-	public final static String RIGHT = "12345";
+	public final static String RIGHT = "54321";
 
 	public App() {
 		game = new Game();
@@ -31,9 +30,7 @@ public class App {
 			size = startResponse.getSize();
 		}
 		String ret = app.phase1();
-		Set<Integer> alreadyPlaced = new HashSet<Integer>();
-		app.phase2(0, alreadyPlaced, ret);
-		System.out.println(ret);
+		app.phase2(ret);
 	}
 
 	public String phase1() {
@@ -53,16 +50,8 @@ public class App {
 				break;
 			}
 		}
-		System.out.println("Phase 1 " + ret);
+		System.out.println("Phase 1: " + ret);
 		return ret;
-	}
-
-	private String intToString(int[] number) {
-		StringBuffer string = new StringBuffer();
-		for (int i : number) {
-			string.append(i + "");
-		}
-		return string.toString();
 	}
 
 	private int checkTest(String test) {
@@ -90,12 +79,10 @@ public class App {
 		return testResponse;
 	}
 
-	public void phase2(int idx, Set<Integer> alreadyPlaced, String tableNumber) {
-		checkTest(tableNumber);
+	public void phase2(String tableNumber) {
 		String string = StringUtils.repeat(tableNumber.charAt(0), size);
 		StringBuilder trouve = new StringBuilder(string);
 		StringBuilder p = new StringBuilder(string);
-		p.setCharAt(4, 'x');
 		for (int c = 0; c < size; ++c) {
 			int noteMax = 0;
 			for (int n = 0; n < size; ++n) {
@@ -107,7 +94,7 @@ public class App {
 				}
 			}
 		}
-		checkTest(p.toString());
+		checkTest(trouve.toString());
 	}
 
 	public TestResponse check(String result, String rightAnswer) {
@@ -117,11 +104,17 @@ public class App {
 		int size = resultArray.length;
 		int good = 0;
 		int wrong_place = 0;
+		Set<Integer> alreadyPassed = new HashSet<Integer>();
 		for (int i = 0; i < size; i++) {
+			if (!alreadyPassed.contains(Integer.parseInt(resultArray[i] + ""))) {
+				wrong_place += StringUtils.countMatches(rightAnswer, resultArray[i]);
+				alreadyPassed.add(Integer.parseInt(resultArray[i] + ""));
+			}
 			if (resultArray[i] == rightAnswerArray[i]) {
 				good++;
 			}
 		}
+		wrong_place = wrong_place - good;
 		response.setGood(good);
 		response.setWrongPlace(wrong_place);
 		return response;
