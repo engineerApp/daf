@@ -5,8 +5,8 @@ import java.util.Set;
 
 import org.apache.commons.lang3.StringUtils;
 
+import com.ymagis.daf.game.ApiGame;
 import com.ymagis.daf.game.Game;
-import com.ymagis.daf.game.LocalGame;
 import com.ymagis.daf.response.StartResponse;
 import com.ymagis.daf.response.TestResponse;
 
@@ -19,7 +19,7 @@ public class App {
 	}
 
 	public static void main(String[] args) {
-		Game game = new LocalGame("1234567890");
+		Game game = new ApiGame();
 		App app = new App(game);
 		System.out.println(app.startGame());
 		System.out.println("call count : " + game.getCallCount());
@@ -27,7 +27,12 @@ public class App {
 
 	public String startGame() {
 		StartResponse startResponse = game.start();
-		size = startResponse.getSize();
+		if (startResponse.getError() == null) {
+			size = startResponse.getSize();
+		} else {
+			size = 8;
+		}
+
 		String ret = phase1();
 		return phase2(ret);
 	}
