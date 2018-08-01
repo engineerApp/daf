@@ -1,5 +1,6 @@
 package com.ymagis.daf;
 
+import java.util.HashMap;
 import java.util.HashSet;
 
 import org.apache.commons.lang3.StringUtils;
@@ -12,6 +13,7 @@ import com.ymagis.daf.response.TestResponse;
 public class App {
 	private Game game;
 	private static int size = 0;
+	private HashMap<String, Integer> isomorphResults = new HashMap<String, Integer>();
 
 	public App(Game iGame) {
 		game = iGame;
@@ -46,6 +48,7 @@ public class App {
 		for (int i = 0; i < 10; i++) {
 			number = StringUtils.repeat(i + "", size);
 			int good = checkTest(number);
+			isomorphResults.put(number, good);
 			if (good == size) {
 				return number;
 			}
@@ -70,6 +73,7 @@ public class App {
 			System.exit(0);
 		}
 		int good = testResponse.getGood();
+		System.out.println(test + " : " + good);
 		return good;
 	}
 
@@ -93,29 +97,36 @@ public class App {
 	}
 
 	public String phase2(String numberList) {
+		System.out.println(numberList);
 		String string = StringUtils.repeat(numberList.charAt(0), size);
 		StringBuilder trouve = new StringBuilder(string);
 		StringBuilder p;
 		Character[] characters = stringToSet(numberList);
 		for (int c = 0; c < size; ++c) {
-			System.out.println("----------------case " + c + "----------------");
-			p = new StringBuilder(string);
+			System.out.println("case " + c + " " + numberList);
+			p = new StringBuilder(StringUtils.repeat(characters[0], size));
+			int noteIsomorph = isomorphResults.get(p.toString());
 			int noteMax = 0;
 			for (int n = 0; n < characters.length; ++n) {
 				p.setCharAt(c, characters[n]);
+				int note = 0;
 				if (isIsomorph(p.toString())) {
-					continue;
+					note = isomorphResults.get(p.toString());
+				} else {
+					note = checkTest(p.toString());
 				}
-				System.out.println(c + " " + n + " " + p.toString());
-				int note = checkTest(p.toString());
+
 				if (note == size) {
 					return p.toString();
 				}
-				if ((note > 0) && (note >= noteMax)) {
+				if ((noteIsomorph + 1) == note) {
 					noteMax = note;
 					trouve.setCharAt(c, characters[n]);
-					System.out.println(c + " " + n + " trouve : " + trouve + " noteMax : " + noteMax);
+					break;
 				}
+			}
+			if (noteMax == 0) {
+				trouve.setCharAt(c, characters[0]);
 			}
 			numberList = removeOne(trouve.charAt(c), numberList);
 			characters = stringToSet(numberList);
