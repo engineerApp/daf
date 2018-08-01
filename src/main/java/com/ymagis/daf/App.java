@@ -18,7 +18,7 @@ public class App {
 	}
 
 	public static void main(String[] args) {
-		Game game = new LocalGame("1549542788878738738767727272600000");
+		Game game = new LocalGame("53375480");
 		App app = new App(game);
 		System.out.println(app.startGame());
 		System.out.println("call count : " + game.getCallCount());
