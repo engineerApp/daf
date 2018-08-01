@@ -45,7 +45,7 @@ public class AppTest extends TestCase {
 		App app = new App(gameLocal);
 		System.out.println(gameLocal.getCallCount());
 		assertEquals(expected, app.startGame());
-		assertEquals(35, gameLocal.getCallCount());
+		assertEquals(22, gameLocal.getCallCount());
 	}
 
 	public void testLocal() {
