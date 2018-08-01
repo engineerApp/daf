@@ -106,7 +106,7 @@ public class App {
 			System.out.println("case " + c + " " + numberList);
 			p = new StringBuilder(StringUtils.repeat(characters[0], size));
 			int noteIsomorph = isomorphResults.get(p.toString());
-			int noteMax = 0;
+			trouve.setCharAt(c, characters[0]);
 			for (int n = 0; n < characters.length; ++n) {
 				p.setCharAt(c, characters[n]);
 				int note = 0;
@@ -120,13 +120,9 @@ public class App {
 					return p.toString();
 				}
 				if ((noteIsomorph + 1) == note) {
-					noteMax = note;
 					trouve.setCharAt(c, characters[n]);
 					break;
 				}
-			}
-			if (noteMax == 0) {
-				trouve.setCharAt(c, characters[0]);
 			}
 			numberList = removeOne(trouve.charAt(c), numberList);
 			characters = stringToSet(numberList);
