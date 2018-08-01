@@ -75,6 +75,7 @@ public class AppTest extends TestCase {
 			Game game = new ApiGame();
 			game.start();
 			game.test("53375481");
+			game.test("53375480");
 		} catch (Exception e) {
 			// TODO: handle exception
 		}
