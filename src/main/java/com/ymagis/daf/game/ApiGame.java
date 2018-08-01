@@ -16,7 +16,7 @@ public class ApiGame extends Game {
 	public ApiGame() {
 		super();
 		try {
-			client = new ApiClient(API_URL, 30000, 30000);
+			client = new ApiClient(API_URL, 5000, 5000);
 		} catch (MalformedURLException e) {
 			e.printStackTrace();
 		}

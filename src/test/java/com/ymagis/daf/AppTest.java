@@ -4,6 +4,7 @@ import java.net.ConnectException;
 import java.net.MalformedURLException;
 
 import com.ymagis.daf.api.ApiClient;
+import com.ymagis.daf.game.ApiGame;
 import com.ymagis.daf.game.Game;
 import com.ymagis.daf.game.LocalGame;
 import com.ymagis.daf.request.StartRequest;
@@ -54,7 +55,7 @@ public class AppTest extends TestCase {
 		try {
 			String apiUrl = "http://172.16.37.129/";
 			String token = "tokendaf";
-			ApiClient client = new ApiClient(apiUrl, 30000, 30000);
+			ApiClient client = new ApiClient(apiUrl, 5000, 5000);
 
 			StartRequest startRequest = new StartRequest();
 			startRequest.setToken(token);
@@ -64,10 +65,20 @@ public class AppTest extends TestCase {
 			testRequest.setToken(token);
 			testRequest.setResult("53375480");
 			TestResponse testResponse = client.test(testRequest);
-			assertTrue(true);
 		} catch (Exception e) {
-			assertTrue(true);
 		}
+		assertTrue(true);
+	}
+
+	public void testApiGame() {
+		try {
+			Game game = new ApiGame();
+			game.start();
+			game.test("53375481");
+		} catch (Exception e) {
+			// TODO: handle exception
+		}
+		assertTrue(true);
 	}
 
 	public void testRequest() {
