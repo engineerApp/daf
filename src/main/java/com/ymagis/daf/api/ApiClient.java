@@ -57,8 +57,8 @@ public class ApiClient {
 			String startInput = mapper.writeValueAsString(startRequest);
 			startClientResponse = getClientResponse(START, startInput);
 			if (startClientResponse.getStatus() == 200) {
-				StartResponse startResponse = mapper.readValue(startClientResponse.getEntity(String.class),
-						StartResponse.class);
+				String result = startClientResponse.getEntity(String.class);
+				StartResponse startResponse = mapper.readValue(result, StartResponse.class);
 				return startResponse;
 			} else {
 				throw new Exception("Start failed, code error : " + startClientResponse.getStatus());

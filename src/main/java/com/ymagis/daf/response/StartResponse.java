@@ -59,4 +59,5 @@ public class StartResponse {
 		return "StartResponse{" + "size = '" + size + '\'' + ",name = '" + name + '\'' + ",quizz_id = '" + quizzId
 				+ '\'' + "}";
 	}
+	
 }
