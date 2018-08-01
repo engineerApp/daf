@@ -44,6 +44,10 @@ public class TestResponse {
 
 	@Override
 	public String toString() {
-		return "Response{" + "good = '" + good + '\'' + ",wrong_place = '" + wrongPlace + '\'' + "}";
+		return "TestResponse{" +
+				"good=" + good +
+				", wrongPlace=" + wrongPlace +
+				", error='" + error + '\'' +
+				'}';
 	}
 }

@@ -5,20 +5,20 @@ import com.ymagis.daf.response.TestResponse;
 
 public abstract class Game {
 
-	private int callCount;
+    private int callCount;
 
-	public int getCallCount() {
-		return callCount;
-	}
+    public int getCallCount() {
+        return callCount;
+    }
 
-	public Game() {
-		callCount = 0;
-	}
+    Game() {
+        callCount = 0;
+    }
 
-	public abstract StartResponse start();
+    public abstract StartResponse start();
 
-	public TestResponse test(String proposition) {
-		callCount++;
-		return null;
-	};
+    public TestResponse test(String proposition) {
+        callCount++;
+        return null;
+    }
 }

@@ -28,7 +28,7 @@ public class LocalGame extends Game {
 		return check(result);
 	}
 
-	public TestResponse check(String result) {
+	private TestResponse check(String result) {
 		TestResponse response = new TestResponse();
 		char[] resultArray = result.toCharArray();
 		char[] rightAnswerArray = rightAnswer.toCharArray();

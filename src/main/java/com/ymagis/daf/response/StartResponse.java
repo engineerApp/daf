@@ -56,8 +56,11 @@ public class StartResponse {
 
 	@Override
 	public String toString() {
-		return "StartResponse{" + "size = '" + size + '\'' + ",name = '" + name + '\'' + ",quizz_id = '" + quizzId
-				+ '\'' + "}";
+		return "StartResponse{" +
+				"size=" + size +
+				", name='" + name + '\'' +
+				", quizzId=" + quizzId +
+				", error='" + error + '\'' +
+				'}';
 	}
-	
 }

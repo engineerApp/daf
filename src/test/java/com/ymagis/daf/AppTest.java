@@ -1,8 +1,5 @@
 package com.ymagis.daf;
 
-import java.net.ConnectException;
-import java.net.MalformedURLException;
-
 import com.ymagis.daf.api.ApiClient;
 import com.ymagis.daf.game.ApiGame;
 import com.ymagis.daf.game.Game;
@@ -15,122 +12,129 @@ import com.ymagis.daf.response.TestResponse;
 import junit.framework.Test;
 import junit.framework.TestCase;
 import junit.framework.TestSuite;
+import org.codehaus.jackson.map.ObjectMapper;
+
+import java.io.IOException;
 
 /**
  * Unit test for simple App.
  */
 public class AppTest extends TestCase {
-	/**
-	 * Create the test case
-	 *
-	 * @param testName
-	 *            name of the test case
-	 */
-	public AppTest(String testName) {
-		super(testName);
-	}
+    private final ObjectMapper mapper;
 
-	/**
-	 * @return the suite of tests being tested
-	 */
-	public static Test suite() {
-		return new TestSuite(AppTest.class);
-	}
+    /**
+     * Create the test case
+     *
+     * @param testName name of the test case
+     */
+    public AppTest(String testName) {
+        super(testName);
+        mapper = new ObjectMapper();
+    }
 
-	/**
-	 * Rigourous Test :-)
-	 */
-	public void testExpectedLocal(String expected) {
-		Game gameLocal = new LocalGame(expected);
-		App app = new App(gameLocal);
-		System.out.println(gameLocal.getCallCount());
-		assertEquals(expected, app.startGame());
-		assertEquals(22, gameLocal.getCallCount());
-	}
+    /**
+     * @return the suite of tests being tested
+     */
+    public static Test suite() {
+        return new TestSuite(AppTest.class);
+    }
 
-	public void testLocal() {
-		testExpectedLocal("53375480");
-	}
+    /**
+     * Rigourous Test :-)
+     */
+    private int testExpectedLocal(String expected) {
+        Game gameLocal = new LocalGame(expected);
+        App app = new App(gameLocal);
+        System.out.println(gameLocal.getCallCount());
+        assertEquals(expected, app.startGame());
+        return gameLocal.getCallCount();
+    }
 
-	public void testApi() {
-		try {
-			String apiUrl = "http://172.16.37.129/";
-			String token = "tokendaf";
-			ApiClient client = new ApiClient(apiUrl, 5000, 5000);
+    public void testLocal() {
+        int callCount = testExpectedLocal("53375480");
+        assertEquals(22, callCount);
+        testExpectedLocal("533754800");
+    }
 
-			StartRequest startRequest = new StartRequest();
-			startRequest.setToken(token);
-			StartResponse startResponse = client.start(startRequest);
+    public void testApi() {
+        try {
+            String apiUrl = "http://172.16.37.129/";
+            String token = "tokendaf";
+            ApiClient client;
+            client = new ApiClient(apiUrl, 5000, 5000);
 
-			TestRequest testRequest = new TestRequest();
-			testRequest.setToken(token);
-			testRequest.setResult("53375480");
-			TestResponse testResponse = client.test(testRequest);
-		} catch (Exception e) {
-		}
-		assertTrue(true);
-	}
+            StartRequest startRequest = new StartRequest();
+            startRequest.setToken(token);
+            client.start(startRequest);
 
-	public void testApiGame() {
-		try {
-			Game game = new ApiGame();
-			game.start();
-			game.test("53375481");
-			game.test("53375480");
-		} catch (Exception e) {
-			// TODO: handle exception
-		}
-		assertTrue(true);
-	}
+            TestRequest testRequest = new TestRequest();
+            testRequest.setToken(token);
+            testRequest.setResult("53375480");
+            client.test(testRequest);
+        } catch (Exception ignored) {
+        }
+        assertTrue(true);
+    }
 
-	public void testRequest() {
-		TestRequest testRequest = new TestRequest();
-		testRequest.setToken("tokendaf");
-		assertEquals(testRequest.getToken(), "tokendaf");
-		testRequest.setResult("12345");
-		assertEquals(testRequest.getResult(), "12345");
+    public void testApiGame() {
+        try {
+            Game game = new ApiGame();
+            game.start();
+            game.test("53375481");
+            game.test("53375480");
+        } catch (Exception e) {
+            // TODO: handle exception
+        }
+        assertTrue(true);
+    }
 
-		StartRequest startRequest = new StartRequest();
-		startRequest.setToken("tokendaf");
-		assertEquals(startRequest.getToken(), "tokendaf");
-	}
+    public void testRequest() {
+        TestRequest testRequest = new TestRequest();
+        testRequest.setToken("tokendaf");
+        assertEquals(testRequest.getToken(), "tokendaf");
+        testRequest.setResult("12345");
+        assertEquals(testRequest.getResult(), "12345");
 
-	public void testResponse() {
-		String name = "tokendaf";
-		String error = "error";
-		int size = 8;
-		int quizzId = 8;
-		int wrong_place = 8;
-		int good = 8;
-		StartResponse startResponse = new StartResponse();
-		startResponse.setName(name);
-		assertEquals(startResponse.getName(), name);
+        StartRequest startRequest = new StartRequest();
+        startRequest.setToken("tokendaf");
+        assertEquals(startRequest.getToken(), "tokendaf");
+    }
 
-		startResponse.setSize(size);
-		assertEquals(startResponse.getSize(), size);
+    public void testResponse() throws IOException {
 
-		startResponse.setQuizzId(quizzId);
-		assertEquals(startResponse.getQuizzId(), quizzId);
+        StartResponse expectedStartResponse = new StartResponse();
+        expectedStartResponse.setSize(8);
+        expectedStartResponse.setError("error");
+        expectedStartResponse.setName("Quizz test");
+        expectedStartResponse.setQuizzId(8);
+        String startResponseJson = "{\n" +
+                "\t\"name\" :\"Quizz test\",\n" +
+                "\t\"size\" : 8,\n" +
+                "\t\"quizz_id\":8,\n" +
+                "\t\"Error\":\"error\"\n" +
+                "}";
+        StartResponse startResponse = mapper.readValue(startResponseJson, StartResponse.class);
+        assertEquals(startResponse.getError(), expectedStartResponse.getError());
+        assertEquals(startResponse.getSize(), expectedStartResponse.getSize());
+        assertEquals(startResponse.getName(), expectedStartResponse.getName());
+        assertEquals(startResponse.getQuizzId(), expectedStartResponse.getQuizzId());
+        assertEquals(startResponse.toString(), expectedStartResponse.toString());
 
-		startResponse.setError(error);
-		assertEquals(startResponse.getError(), error);
+        TestResponse expectedTestResponse = new TestResponse();
+        expectedTestResponse.setError("error");
+        expectedTestResponse.setGood(6);
+        expectedTestResponse.setWrongPlace(2);
+        String testResponseJson = "{\n" +
+                "\t\"Error\":\"error\",\n" +
+                "\t\"good\":6,\n" +
+                "\t\"wrong_place\":2\n" +
+                "}";
+        TestResponse testResponse = mapper.readValue(testResponseJson, TestResponse.class);
+        assertEquals(testResponse.getGood(), expectedTestResponse.getGood());
+        assertEquals(testResponse.getWrongPlace(), expectedTestResponse.getWrongPlace());
+        assertEquals(testResponse.getError(), expectedTestResponse.getError());
+        assertEquals(testResponse.toString(), expectedTestResponse.toString());
 
-		String expectedToString = "StartResponse{" + "size = '" + size + '\'' + ",name = '" + name + '\''
-				+ ",quizz_id = '" + quizzId + '\'' + "}";
-		assertEquals(expectedToString, startResponse.toString());
-
-		TestResponse testResponse = new TestResponse();
-		testResponse.setError(error);
-		assertEquals(testResponse.getError(), error);
-
-		testResponse.setGood(good);
-		assertEquals(testResponse.getGood(), good);
-
-		testResponse.setWrongPlace(wrong_place);
-		assertEquals(testResponse.getWrongPlace(), wrong_place);
-		expectedToString = "Response{" + "good = '" + good + '\'' + ",wrong_place = '" + wrong_place + '\'' + "}";
-		assertEquals(expectedToString, testResponse.toString());
-
-	}
+    }
 
 }
