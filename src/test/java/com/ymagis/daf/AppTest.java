@@ -3,7 +3,6 @@ package com.ymagis.daf;
 import java.net.MalformedURLException;
 
 import com.ymagis.daf.api.ApiClient;
-import com.ymagis.daf.game.ApiGame;
 import com.ymagis.daf.game.Game;
 import com.ymagis.daf.game.LocalGame;
 import com.ymagis.daf.request.StartRequest;
@@ -43,15 +42,32 @@ public class AppTest extends TestCase {
 		Game gameLocal = new LocalGame(expected);
 		App app = new App(gameLocal);
 		assertEquals(expected, app.startGame());
+		assertEquals(74, gameLocal.getCallCount());
 	}
 
 	public void testLocal() {
-		testExpectedLocal("1234567890");
-		testExpectedLocal("0000000");
-		testExpectedLocal("1277777890");
-		testExpectedLocal("127890");
-		testExpectedLocal("0");
-		testExpectedLocal("890");
+		testExpectedLocal("53375480");
+	}
+
+	public void testApi() {
+		try {
+			String apiUrl = "http://172.16.37.129/";
+			String token = "tokendaf";
+			ApiClient client = new ApiClient(apiUrl, 30000, 30000);
+
+			StartRequest startRequest = new StartRequest();
+			startRequest.setToken(token);
+			StartResponse startResponse = client.start(startRequest);
+
+			TestRequest testRequest = new TestRequest();
+			testRequest.setToken(token);
+			testRequest.setResult("53375480");
+			TestResponse testResponse = client.test(testRequest);
+			assertTrue(true);
+		} catch (Exception e) {
+			assertTrue(false);
+		}
+
 	}
 
 	public void testRequest() {
@@ -60,9 +76,10 @@ public class AppTest extends TestCase {
 		assertEquals(testRequest.getToken(), "tokendaf");
 		testRequest.setResult("12345");
 		assertEquals(testRequest.getResult(), "12345");
+
 		StartRequest startRequest = new StartRequest();
 		startRequest.setToken("tokendaf");
-		assertEquals(testRequest.getToken(), "tokendaf");
+		assertEquals(startRequest.getToken(), "tokendaf");
 	}
 
 	public void testResponse() {
@@ -71,6 +88,7 @@ public class AppTest extends TestCase {
 		int size = 8;
 		int quizzId = 8;
 		int wrong_place = 8;
+		int good = 8;
 		StartResponse startResponse = new StartResponse();
 		startResponse.setName(name);
 		assertEquals(startResponse.getName(), name);
@@ -92,8 +110,13 @@ public class AppTest extends TestCase {
 		testResponse.setError(error);
 		assertEquals(testResponse.getError(), error);
 
+		testResponse.setGood(good);
+		assertEquals(testResponse.getGood(), good);
+
 		testResponse.setWrongPlace(wrong_place);
 		assertEquals(testResponse.getWrongPlace(), wrong_place);
+		expectedToString = "Response{" + "good = '" + good + '\'' + ",wrong_place = '" + wrong_place + '\'' + "}";
+		assertEquals(expectedToString, testResponse.toString());
 
 	}
 

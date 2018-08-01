@@ -1,8 +1,5 @@
 package com.ymagis.daf;
 
-import java.util.HashSet;
-import java.util.Set;
-
 import org.apache.commons.lang3.StringUtils;
 
 import com.ymagis.daf.game.ApiGame;
@@ -32,7 +29,6 @@ public class App {
 		} else {
 			size = 8;
 		}
-
 		String ret = phase1();
 		return phase2(ret);
 	}
@@ -60,6 +56,10 @@ public class App {
 
 	private int checkTest(String test) {
 		TestResponse testResponse = game.test(test);
+		if (testResponse == null || testResponse.getError() != null) {
+			System.out.println("Error: " + testResponse.getError());
+			System.exit(0);
+		}
 		int good = testResponse.getGood();
 		return good;
 	}
