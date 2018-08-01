@@ -54,18 +54,6 @@ public class AppTest extends TestCase {
 		testExpectedLocal("890");
 	}
 
-	public void testExpectedApi(String expected) {
-		int expectedCallCount = 74;
-		Game gameApi = new ApiGame();
-		App app = new App(gameApi);
-		assertEquals(expected, app.startGame());
-		assertEquals(expectedCallCount, gameApi.getCallCount());
-	}
-
-	public void testApi() {
-		testExpectedApi("53375480");
-	}
-
 	public void testRequest() {
 		TestRequest testRequest = new TestRequest();
 		testRequest.setToken("tokendaf");

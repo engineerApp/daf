@@ -51,21 +51,21 @@ public class ApiClient {
 		return res;
 	}
 
-	public StartResponse start(StartRequest startRequest) {
+	public <Res, Req> Res sendResponse(Req req, Class<Res> classNameRes, String path) {
 		ClientResponse startClientResponse = null;
 		try {
-			String startInput = mapper.writeValueAsString(startRequest);
-			startClientResponse = getClientResponse(START, startInput);
+			String startInput = mapper.writeValueAsString(req);
+			startClientResponse = getClientResponse(path, startInput);
 			if (startClientResponse.getStatus() == 200) {
 				String result = startClientResponse.getEntity(String.class);
-				StartResponse startResponse = mapper.readValue(result, StartResponse.class);
+				Res startResponse = (Res) mapper.readValue(result, classNameRes); 
 				return startResponse;
 			} else {
 				throw new Exception("Start failed, code error : " + startClientResponse.getStatus());
 			}
 		} catch (Exception e) {
 			Logger.getLogger(ApiClient.class.getName()).log(Level.SEVERE, e.getMessage(), e);
-			return new StartResponse();
+			return null;
 		} finally {
 			if (startClientResponse != null) {
 				try {
@@ -76,28 +76,11 @@ public class ApiClient {
 		}
 	}
 
+	public StartResponse start(StartRequest startRequest) {
+		return sendResponse(startRequest, StartResponse.class, START);
+	}
+
 	public TestResponse test(TestRequest testRequest) {
-		ClientResponse testClientResponse = null;
-		try {
-			String testInput = mapper.writeValueAsString(testRequest);
-			testClientResponse = getClientResponse(TEST, testInput);
-			if (testClientResponse.getStatus() == 200) {
-				String responseString = testClientResponse.getEntity(String.class);
-				TestResponse testResponse = mapper.readValue(responseString, TestResponse.class);
-				return testResponse;
-			} else {
-				throw new Exception("Test failed, code error : " + testClientResponse.getStatus());
-			}
-		} catch (Exception e) {
-			Logger.getLogger(ApiClient.class.getName()).log(Level.SEVERE, e.getMessage(), e);
-			return new TestResponse();
-		} finally {
-			if (testClientResponse != null) {
-				try {
-					testClientResponse.close();
-				} catch (Exception ignored) {
-				}
-			}
-		}
+		return sendResponse(testRequest, TestResponse.class, TEST);
 	}
 }
