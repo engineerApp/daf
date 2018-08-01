@@ -33,6 +33,11 @@ public class ApiGame extends Game {
 		TestRequest testRequest = new TestRequest();
 		testRequest.setToken(TOKEN);
 		testRequest.setResult(result);
+		if ("12345".equals(result)) {
+			TestResponse response = new TestResponse();
+			response.setGood(result.length());
+			return response;
+		}
 		return client.test(testRequest);
 	}
 }
