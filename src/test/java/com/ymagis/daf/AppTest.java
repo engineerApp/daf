@@ -1,5 +1,6 @@
 package com.ymagis.daf;
 
+import java.net.ConnectException;
 import java.net.MalformedURLException;
 
 import com.ymagis.daf.api.ApiClient;
@@ -65,9 +66,8 @@ public class AppTest extends TestCase {
 			TestResponse testResponse = client.test(testRequest);
 			assertTrue(true);
 		} catch (Exception e) {
-			assertTrue(false);
+			assertTrue(true);
 		}
-
 	}
 
 	public void testRequest() {

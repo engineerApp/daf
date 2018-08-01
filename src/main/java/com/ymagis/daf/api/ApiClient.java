@@ -58,13 +58,13 @@ public class ApiClient {
 			startClientResponse = getClientResponse(path, startInput);
 			if (startClientResponse.getStatus() == 200) {
 				String result = startClientResponse.getEntity(String.class);
-				Res startResponse = (Res) mapper.readValue(result, classNameRes); 
+				Res startResponse = (Res) mapper.readValue(result, classNameRes);
 				return startResponse;
 			} else {
 				throw new Exception("Start failed, code error : " + startClientResponse.getStatus());
 			}
 		} catch (Exception e) {
-			Logger.getLogger(ApiClient.class.getName()).log(Level.SEVERE, e.getMessage(), e);
+			//Logger.getLogger(ApiClient.class.getName()).log(Level.SEVERE, e.getMessage(), e);
 			return null;
 		} finally {
 			if (startClientResponse != null) {

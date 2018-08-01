@@ -24,6 +24,10 @@ public class App {
 
 	public String startGame() {
 		StartResponse startResponse = game.start();
+		if (startResponse==null) {
+			System.out.println("Can't call api");
+			System.exit(0);
+		}
 		if (startResponse.getError() == null) {
 			size = startResponse.getSize();
 		} else {
@@ -86,6 +90,6 @@ public class App {
 		if (noteFinal == size) {
 			return trouve.toString();
 		}
-		return "not found best resulat is : " + trouve.toString();
+		return "not found best result is : " + trouve.toString();
 	}
 }
