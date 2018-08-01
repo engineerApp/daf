@@ -1,13 +1,18 @@
 package com.ymagis.daf.response;
 
+import org.codehaus.jackson.annotate.JsonIgnoreProperties;
 import org.codehaus.jackson.annotate.JsonProperty;
 
+@JsonIgnoreProperties(ignoreUnknown = true)
 public class TestResponse {
 	@JsonProperty("good")
 	private int good;
 
 	@JsonProperty("wrong_place")
 	private int wrongPlace;
+
+	@JsonProperty("Error")
+	private String error;
 
 	public TestResponse() {
 
@@ -27,6 +32,14 @@ public class TestResponse {
 
 	public int getWrongPlace() {
 		return wrongPlace;
+	}
+
+	public String getError() {
+		return error;
+	}
+
+	public void setError(String error) {
+		this.error = error;
 	}
 
 	@Override
