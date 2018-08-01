@@ -5,32 +5,31 @@ import java.util.Set;
 
 import org.apache.commons.lang3.StringUtils;
 
+import com.ymagis.daf.game.Game;
+import com.ymagis.daf.game.LocalGame;
 import com.ymagis.daf.response.StartResponse;
 import com.ymagis.daf.response.TestResponse;
 
 public class App {
 	private Game game;
-	private static boolean testLocal = true;
-	private static boolean isStart = true;
-	private static int callCount = 0;
 	private static int size = 0;
 
-	public final static String RIGHT = "54321";
-
-	public App() {
-		game = new Game();
+	public App(Game iGame) {
+		game = iGame;
 	}
 
 	public static void main(String[] args) {
-		App app = new App();
-		size = RIGHT.length();
-		if (!testLocal && !isStart) {
-			StartResponse startResponse = app.game.start();
-			System.out.println(startResponse);
-			size = startResponse.getSize();
-		}
-		String ret = app.phase1();
-		app.phase2(ret);
+		Game game = new LocalGame("1234567890");
+		App app = new App(game);
+		System.out.println(app.startGame());
+		System.out.println("call count : " + game.getCallCount());
+	}
+
+	public String startGame() {
+		StartResponse startResponse = game.start();
+		size = startResponse.getSize();
+		String ret = phase1();
+		return phase2(ret);
 	}
 
 	public String phase1() {
@@ -38,10 +37,10 @@ public class App {
 		int count = 0;
 		String ret = "";
 		for (int i = 0; i < 10; i++) {
-			number = StringUtils.repeat(i + "", 5);
-			TestResponse testResponse = getTestResponse(number);
-			if (testResponse.getGood() > 0) {
-				for (int j = 0; j < testResponse.getGood(); j++) {
+			number = StringUtils.repeat(i + "", size);
+			int good = checkTest(number);
+			if (good > 0) {
+				for (int j = 0; j < good; j++) {
 					ret += i;
 					count++;
 				}
@@ -55,31 +54,12 @@ public class App {
 	}
 
 	private int checkTest(String test) {
-		TestResponse testResponse = getTestResponse(test);
+		TestResponse testResponse = game.test(test);
 		int good = testResponse.getGood();
-		if (good == size) {
-			System.out.println("good answer: found");
-			System.out.println(test);
-			System.out.println("call count : " + callCount);
-			System.exit(0);
-		}
 		return good;
 	}
 
-	private TestResponse getTestResponse(String s) {
-		callCount++;
-		TestResponse testResponse = null;
-		if (testLocal) {
-			testResponse = check(s, RIGHT);
-		} else {
-			testResponse = game.test(s);
-		}
-		System.out.println(testResponse);
-		System.out.println(s);
-		return testResponse;
-	}
-
-	public void phase2(String tableNumber) {
+	public String phase2(String tableNumber) {
 		String string = StringUtils.repeat(tableNumber.charAt(0), size);
 		StringBuilder trouve = new StringBuilder(string);
 		StringBuilder p = new StringBuilder(string);
@@ -88,35 +68,19 @@ public class App {
 			for (int n = 0; n < size; ++n) {
 				p.setCharAt(c, tableNumber.charAt(n));
 				int note = checkTest(p.toString());
+				if (note == size) {
+					return p.toString();
+				}
 				if ((note > 0) && (note >= noteMax)) {
 					noteMax = note;
 					trouve.setCharAt(c, tableNumber.charAt(n));
 				}
 			}
 		}
-		checkTest(trouve.toString());
-	}
-
-	public TestResponse check(String result, String rightAnswer) {
-		TestResponse response = new TestResponse();
-		char[] resultArray = result.toCharArray();
-		char[] rightAnswerArray = rightAnswer.toCharArray();
-		int size = resultArray.length;
-		int good = 0;
-		int wrong_place = 0;
-		Set<Integer> alreadyPassed = new HashSet<Integer>();
-		for (int i = 0; i < size; i++) {
-			if (!alreadyPassed.contains(Integer.parseInt(resultArray[i] + ""))) {
-				wrong_place += StringUtils.countMatches(rightAnswer, resultArray[i]);
-				alreadyPassed.add(Integer.parseInt(resultArray[i] + ""));
-			}
-			if (resultArray[i] == rightAnswerArray[i]) {
-				good++;
-			}
+		int noteFinal = checkTest(trouve.toString());
+		if (noteFinal == size) {
+			return trouve.toString();
 		}
-		wrong_place = wrong_place - good;
-		response.setGood(good);
-		response.setWrongPlace(wrong_place);
-		return response;
+		return "not found best resulat is : " + trouve.toString();
 	}
 }
