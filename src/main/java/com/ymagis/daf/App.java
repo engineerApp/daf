@@ -5,8 +5,8 @@ import java.util.HashSet;
 
 import org.apache.commons.lang3.StringUtils;
 
+import com.ymagis.daf.game.ApiGame;
 import com.ymagis.daf.game.Game;
-import com.ymagis.daf.game.LocalGame;
 import com.ymagis.daf.response.StartResponse;
 import com.ymagis.daf.response.TestResponse;
 
@@ -21,7 +21,7 @@ public class App {
 
 	public static void main(String[] args) {
 		long startTime = System.currentTimeMillis();
-		App app = new App(new LocalGame("53375480"));
+		App app = new App(new ApiGame());
 		app.printResult(startTime, app.startGame());
 	}
 
@@ -44,7 +44,7 @@ public class App {
 		if (startResponse.getError() == null) {
 			size = startResponse.getSize();
 		} else {
-			size = 8;
+			size = 100;
 		}
 		String ret = phase1();
 		return phase2(ret);
@@ -61,8 +61,9 @@ public class App {
 
 	private String getFound1(int count, StringBuilder ret) {
 		String number;
-		for (int i = 0; i < 10; i++) {
-			number = StringUtils.repeat(i + "", size);
+		String dictionnaire = "0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ";
+		for (int i = 0; i < dictionnaire.length(); i++) {
+			number = StringUtils.repeat(dictionnaire.charAt(i), size);
 			int good = checkTest(number);
 			isomorphResults.put(number, good);
 			if (good == size) {
@@ -71,7 +72,7 @@ public class App {
 			if (good > 0) {
 				for (int j = 0; j < good; j++) {
 					count++;
-					ret.append(i);
+					ret.append(dictionnaire.charAt(i));
 				}
 			}
 			if (count == size) {
@@ -101,14 +102,12 @@ public class App {
 	}
 
 	private boolean isIsomorph(String string) {
-		String s;
-		for (int i = 0; i < 10; i++) {
-			s = StringUtils.repeat(i + "", size);
-			if (s.equals(string)) {
-				return true;
+		for (int i = 1; i < string.length(); i++) {
+			if (string.charAt(0) != string.charAt(i)) {
+				return false;
 			}
 		}
-		return false;
+		return true;
 	}
 
 	private String phase2(String numberList) {

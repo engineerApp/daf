@@ -35,11 +35,11 @@ public class LocalGame extends Game {
 		int size = resultArray.length;
 		int good = 0;
 		int wrong_place = 0;
-		Set<Integer> alreadyPassed = new HashSet<Integer>();
+		Set<Character> alreadyPassed = new HashSet<Character>();
 		for (int i = 0; i < size; i++) {
-			if (!alreadyPassed.contains(Integer.parseInt(resultArray[i] + ""))) {
+			if (!alreadyPassed.contains(resultArray[i])) {
 				wrong_place += StringUtils.countMatches(rightAnswer, resultArray[i]);
-				alreadyPassed.add(Integer.parseInt(resultArray[i] + ""));
+				alreadyPassed.add(resultArray[i]);
 			}
 			if (resultArray[i] == rightAnswerArray[i]) {
 				good++;
