@@ -21,13 +21,15 @@ public class App {
 
 	public static void main(String[] args) {
 		long startTime = System.currentTimeMillis();
-		Game game = new LocalGame("53375480");
-		App app = new App(game);
-		String answer = app.startGame();
+		App app = new App(new LocalGame("53375480"));
+		app.printResult(startTime, app.startGame());
+	}
+
+	public void printResult(long startTime, String answer) {
 		long stopTime = System.currentTimeMillis();
 		long elapsedTime = stopTime - startTime;
 		System.out.println("------------------------------------------");
-		System.out.println("elapsedTime : " + (float) elapsedTime / 1000 + " s");
+		System.out.println("ElapsedTime : " + (float) elapsedTime / 1000 + " s");
 		System.out.println("Answer : " + answer);
 		System.out.println("Call count : " + game.getCallCount());
 		System.out.println("------------------------------------------");
